@@ -1,0 +1,80 @@
+#Requires gtk-server (http://www.gtk-server.org)
+
+squish import "subprocess"
+
+gtk = new
+widget = new
+window = widget.new
+
+gtk.init = {
+	my.server = subprocess.new "gtk-server", ["-stdin", "-log=log.txt"]
+	my.server.run
+	my.callbacks = hash.new
+	my.window = window.new
+}
+
+gtk.send = { message |
+	my.server.write_line message
+	res = my.server.read_line
+	true? res == -1, { p "GTK Error" }
+	res
+}
+
+gtk.set_title = { title |
+	my.window.set_title title
+}
+
+gtk.add = { widget |
+	my.window.add widget
+}
+
+gtk.run = {
+	my.window.show
+	while {
+		result = my.send "u_event"
+		true? my.callbacks.key?(result), { my.callbacks[result]() }
+		result != my.window.id
+	}
+}
+
+widget.init = { id = null |
+	my.id = id
+}
+
+widget.show = {
+	gtk.send "u_show " + my.id
+}
+
+widget.hide = {
+	gtk.send "u_hide " + my.id
+}
+
+widget.disable = {
+	gtk.send "u_disable " + my.id
+}
+
+widget.enable = {
+	gtk.send "u_enable " + my.id
+}
+
+widget.add = { widget, xpos = "0", ypos = "0" |
+	gtk.send "u_attach " + my.id + " " + widget.id + " " + xpos.to_s + " " + ypos.to_s
+}
+
+window.init = { title = "Brat GTK", xsize = "800", ysize = "800" |
+	my.id = gtk.send "u_window 'Brat' " + xsize.to_s + " " + ysize.to_s
+	gtk.send "gtk_window_set_resizable " + my.id + " 1"
+	set_title title
+}
+
+window.set_title = { title |
+	gtk.send "gtk_window_set_title " + my.id + " '" + title + "'"
+}
+
+gtk.button = widget.new
+gtk.button.init = { text = "Button", xsize = 100, ysize = 50, toggle = false |
+	true? toggle, { toggle = 1 }, { toggle = 0 }
+	my.id = gtk.send "u_button \"" + text + "\" " + xsize + " " + ysize + " " + toggle
+}
+
+export gtk, "gtk"
