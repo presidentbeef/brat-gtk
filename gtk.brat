@@ -1,6 +1,6 @@
 #Requires gtk-server (http://www.gtk-server.org)
 
-squish import "subprocess"
+include "subprocess"
 
 gtk = new
 widget = new
@@ -16,7 +16,7 @@ gtk.init = {
 gtk.send = { message |
 	my.server.write_line message
 	res = my.server.read_line
-	true? res == -1, { p "GTK Error" }
+	true? res == -1 { p "GTK Error" }
 	res
 }
 
@@ -32,7 +32,7 @@ gtk.run = {
 	my.window.show
 	while {
 		result = my.send "u_event"
-		true? my.callbacks.key?(result), { my.callbacks[result]() }
+		true? my.callbacks.key?(result) { my.callbacks[result]() }
 		result != my.window.id
 	}
 }
