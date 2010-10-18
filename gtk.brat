@@ -35,6 +35,8 @@ gtk.run = {
 		true? my.callbacks.key?(result) { my.callbacks[result]() }
 		result != my.window.id
 	}
+
+	my.send "u_end"
 }
 
 widget.init = { id = null |
