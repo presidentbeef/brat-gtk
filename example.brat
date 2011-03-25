@@ -1,4 +1,0 @@
-include "gtk"
-gtk.init
-gtk.add gtk.button.new
-gtk.run
