@@ -1,0 +1,23 @@
+include :gtk
+include :number
+gtk.set_title "Fractal Tree"
+gtk.window.resize 600, 550
+canvas = gtk.canvas.new 600, 550, :black
+
+draw_tree = { x1, y1, angle, depth |
+	false? depth == 0 
+		{
+			x2 = x1 + (angle.to_rad.cos * depth * 10).to_i
+			y2 = y1 + (angle.to_rad.sin * depth * 10).to_i
+
+			canvas.line x1, y1, x2, y2, :green
+
+			draw_tree x2, y2, angle - 20, depth - 1
+			draw_tree x2, y2, angle + 20, depth - 1
+		}
+}
+
+draw_tree 300, 500, -90, 9
+
+gtk.window.add canvas
+gtk.run
