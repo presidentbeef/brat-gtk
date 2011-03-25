@@ -1,0 +1,54 @@
+world_size = 100
+particles = 1000
+
+include :gtk
+gtk.set_title "Brownian Tree"
+gtk.window.resize world_size, world_size
+canvas = gtk.canvas.new world_size, world_size
+
+positions = []
+
+world_size.times { i |
+	positions[i] = []
+	world_size.times { j |
+		positions[i][j] = 0
+	}
+}
+
+#First particle
+middle = (world_size / 2).to_i
+positions[middle][middle] = 1
+canvas.pixel middle, middle, "black"
+
+particles.times { particle |
+
+	print "\rParticle ##{particle}"
+
+		x = random world_size
+		y = random world_size 
+
+	while {
+		dx = random -1 1
+		dy = random -1 1
+
+		nextx = x + dx
+		nexty = y + dy
+
+		true? { nextx < 0 || nextx >= world_size || nexty < 0 || nexty >= world_size }
+			{ x = random world_size; y = random world_size }
+			{ true? positions[nextx][nexty] == 1
+				{ positions[x][y] = 1
+					color = "#{random(255).to_hex}#{random(255).to_hex}#{random(255).to_hex}"
+					canvas.pixel x,y, "##{color}"
+					false
+				}
+				{
+					x = nextx
+					y = nexty
+				}
+			}
+	}
+}
+
+gtk.window.add canvas
+gtk.run
