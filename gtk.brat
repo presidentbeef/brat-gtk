@@ -1,7 +1,5 @@
 #Requires gtk-server (http://www.gtk-server.org)
-
-include :subprocess
-include :net
+gtkout = import("lib/gtklib", :send)
 
 gtk = object.new
 widget = object.new
@@ -10,28 +8,11 @@ window = widget.new
 defines = [ "gtk_text_view_scroll_to_iter NONE BOOL 6 WIDGET WIDGET DOUBLE BOOL DOUBLE DOUBLE" ]
 
 gtk.send = { message |
-	my.connection.write message
-	res = my.connection.read_line
-	my.connection.timeout_in 0.001
-	while {
-			line = my.connection.read_line
-			null? line
-				{ false }
-				{ res << "\n" << line }
-	}
-	my.connection.timeout_in -1
+  res = gtkout(message).chomp
 
-	null?(res) 
-		{
-			res = ""
-		}
-		{
-			res = res.chomp
-			true? res.to_i.to_s == res
-				{ res = res.to_i }
-			true? res == "-1" { p "GTK Error" }
-		}
-
+  true? res.to_i.to_s == res
+	  { res = res.to_i }
+	
 	res
 }
 
@@ -195,11 +176,7 @@ gtk.vbox.init = { even_spacing = false, spacing = 5 |
 
 gtk.vbox.append = gtk.hbox->append 
 
-port = random 1024 64000
-gtk.server = subprocess.start "gtk-server" "-tcp=localhost:#{port}"
-subprocess.run "sleep 1"
-gtk.connection = net.connect "localhost" port
-defines.each { d | gtk.send "gtk_server_define #{d}" }
+defines.each { d |  gtk.send "gtk_server_define #{d}" }
 gtk.callbacks = hash.new
 gtk.window = window.new
 
