@@ -51,21 +51,23 @@ widget.init = { id = null |
 	my.id = id
 }
 
-widget.show = {
-	gtk.send "u_show #{my.id}"
-}
+widget.prototype [
+  show: {
+	  gtk.send "u_show #{my.id}"
+  }
 
-widget.hide = {
-	gtk.send "u_hide #{my.id}"
-}
+  hide: {
+	  gtk.send "u_hide #{my.id}"
+  }
 
-widget.disable = {
-	gtk.send "u_disable #{my.id}"
-}
+  disable: {
+  	gtk.send "u_disable #{my.id}"
+  }
 
-widget.enable = {
-	gtk.send "u_enable #{my.id}"
-}
+  enable: {
+  	gtk.send "u_enable #{my.id}"
+  }
+]
 
 window.init = { title = "Brat GTK", xsize = "100", ysize = "100" |
 	my.id = gtk.send "u_window 'Brat' #{xsize} #{ysize}"
@@ -73,17 +75,19 @@ window.init = { title = "Brat GTK", xsize = "100", ysize = "100" |
 	set_title title
 }
 
-window.resize = { xsize, ysize |
-	gtk.send "gtk_window_resize #{my.id} #{xsize} #{ysize}"
-}
+window.prototype [
+  resize: { xsize, ysize |
+  	gtk.send "gtk_window_resize #{my.id} #{xsize} #{ysize}"
+  } 
 
-window.set_title = { title |
-	gtk.send "gtk_window_set_title #{my.id} '#{title}'"
-}
+  set_title: { title |
+  	gtk.send "gtk_window_set_title #{my.id} '#{title}'"
+  }
 
-window.add = { widget, xpos = 0, ypos = 0 |
-	gtk.send "u_attach #{my.id} #{widget.id} #{xpos} #{ypos}"
-}
+  add: { widget, xpos = 0, ypos = 0 |
+  	gtk.send "u_attach #{my.id} #{widget.id} #{xpos} #{ypos}"
+  }
+]
 
 gtk.button = widget.new
 gtk.button.init = { text = "Button", xsize = 100, ysize = 50, toggle = false |
@@ -96,15 +100,17 @@ gtk.canvas.init = { xsize = 250, ysize = 250, color = :white |
 	my.id = gtk.send "u_canvas #{xsize} #{ysize} #{color}"
 }
 
-gtk.canvas.pixel = { x, y, color = :black |
-	gtk.send "u_draw #{my.id}"
-	gtk.send "u_pixel #{color} #{x} #{y}"
-}
+gtk.canvas.prototype [ 
+  pixel: { x, y, color = :black |
+  	gtk.send "u_draw #{my.id}"
+	  gtk.send "u_pixel #{color} #{x} #{y}"
+  }
 
-gtk.canvas.line = { startx, starty, endx, endy, color = :black |
-	gtk.send "u_draw #{my.id}"
-	gtk.send "u_line #{color} #{startx} #{starty} #{endx} #{endy}"
-}
+  line: { startx, starty, endx, endy, color = :black |
+  	gtk.send "u_draw #{my.id}"
+	  gtk.send "u_line #{color} #{startx} #{starty} #{endx} #{endy}"
+  }
+]
 
 gtk.text_box = widget.new
 gtk.text_box.init = { xsize, ysize |
