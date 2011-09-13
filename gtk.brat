@@ -8,12 +8,7 @@ window = widget.new
 defines = [ "gtk_text_view_scroll_to_iter NONE BOOL 6 WIDGET WIDGET DOUBLE BOOL DOUBLE DOUBLE" ]
 
 gtk.send = { message |
-  res = gtkout(message).chomp
-
-  true? res.to_i.to_s == res
-	  { res = res.to_i }
-	
-	res
+  gtkout(message).chomp
 }
 
 gtk.get_variable = { macro, variable |
