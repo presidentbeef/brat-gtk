@@ -1,5 +1,5 @@
 include :gtk
-include :number
+
 gtk.set_title "Fractal Tree"
 gtk.window.resize 600, 550
 canvas = gtk.canvas.new 600, 550, :black
