@@ -9,8 +9,12 @@ local send = function(self, com)
     com = com._lua_string
   end
 
-  local res = gtk.gtk(ffi.cast("char *", com))
-  return base_string:new(ffi.string(res))
+  local res = ffi.string(gtk.gtk(ffi.cast("char *", com)))
+  if res == "-1" then
+    print("GTK failure: " .. tostring(com))
+  end
+
+  return base_string:new(res)
 end
 
 object:export(send, 'send')
