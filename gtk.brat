@@ -12,21 +12,21 @@ gtk.send = { message |
 }
 
 gtk.get_variable = { macro, variable |
-	gtk.send "gtk_server_macro_var #{macro} #{variable}"
+  gtk.send "gtk_server_macro_var #{macro} #{variable}"
 }
 
 gtk.get_opaque = { gtk.send "gtk_server_opaque" }
 
 gtk.set_title = { title |
-	my.window.set_title title
+  my.window.set_title title
 }
 
 gtk.add = { widget |
-	my.window.add widget
+  my.window.add widget
 }
 
 gtk.connect = { widget, block |
-	my.callbacks[widget.id] = ->block
+  my.callbacks[widget.id] = ->block
 }
 
 gtk.run = { block = true |
@@ -45,139 +45,139 @@ gtk.run = { block = true |
 }
 
 widget.init = { id = null |
-	my.id = id
+  my.id = id
 }
 
 widget.prototype [
   show: {
-	  gtk.send "u_show #{my.id}"
+    gtk.send "u_show #{my.id}"
   }
 
   hide: {
-	  gtk.send "u_hide #{my.id}"
+    gtk.send "u_hide #{my.id}"
   }
 
   disable: {
-  	gtk.send "u_disable #{my.id}"
+    gtk.send "u_disable #{my.id}"
   }
 
   enable: {
-  	gtk.send "u_enable #{my.id}"
+    gtk.send "u_enable #{my.id}"
   }
 ]
 
 window.init = { title = "Brat GTK", xsize = "100", ysize = "100" |
-	my.id = gtk.send "u_window 'Brat' #{xsize} #{ysize}"
-	gtk.send "gtk_window_set_resizable #{my.id} 1"
-	set_title title
+  my.id = gtk.send "u_window 'Brat' #{xsize} #{ysize}"
+  gtk.send "gtk_window_set_resizable #{my.id} 1"
+  set_title title
 }
 
 window.prototype [
   resize: { xsize, ysize |
-  	gtk.send "gtk_window_resize #{my.id} #{xsize} #{ysize}"
-  } 
+    gtk.send "gtk_window_resize #{my.id} #{xsize} #{ysize}"
+  }
 
   set_title: { title |
-  	gtk.send "gtk_window_set_title #{my.id} '#{title}'"
+    gtk.send "gtk_window_set_title #{my.id} '#{title}'"
   }
 
   add: { widget, xpos = 0, ypos = 0 |
-  	gtk.send "u_attach #{my.id} #{widget.id} #{xpos} #{ypos}"
+    gtk.send "u_attach #{my.id} #{widget.id} #{xpos} #{ypos}"
   }
 ]
 
 gtk.button = widget.new
 gtk.button.init = { text = "Button", xsize = 100, ysize = 50, toggle = false |
-	true? toggle, { toggle = 1 }, { toggle = 0 }
-	my.id = gtk.send "u_button \"#{text}\" #{xsize} #{ysize} #{toggle}"
+  true? toggle, { toggle = 1 }, { toggle = 0 }
+  my.id = gtk.send "u_button \"#{text}\" #{xsize} #{ysize} #{toggle}"
 }
 
 gtk.canvas = widget.new
 gtk.canvas.init = { xsize = 250, ysize = 250, color = :white |
-	my.id = gtk.send "u_canvas #{xsize} #{ysize} #{color}"
+  my.id = gtk.send "u_canvas #{xsize} #{ysize} #{color}"
 }
 
-gtk.canvas.prototype [ 
+gtk.canvas.prototype [
   pixel: { x, y, color = :black |
-  	gtk.send "u_draw #{my.id}"
-	  gtk.send "u_pixel #{color} #{x} #{y}"
+    gtk.send "u_draw #{my.id}"
+    gtk.send "u_pixel #{color} #{x} #{y}"
   }
 
   line: { startx, starty, endx, endy, color = :black |
-  	gtk.send "u_draw #{my.id}"
-	  gtk.send "u_line #{color} #{startx} #{starty} #{endx} #{endy}"
+    gtk.send "u_draw #{my.id}"
+    gtk.send "u_line #{color} #{startx} #{starty} #{endx} #{endy}"
   }
 ]
 
 gtk.text_box = widget.new
 gtk.text_box.init = { xsize, ysize |
-	my.id = gtk.send "u_text #{xsize} #{ysize}"
-	my.buffer = gtk.get_variable :u_text :buffer
-	my.view = gtk.get_variable :u_text :view
-	my.auto_scroll = false
+  my.id = gtk.send "u_text #{xsize} #{ysize}"
+  my.buffer = gtk.get_variable :u_text :buffer
+  my.view = gtk.get_variable :u_text :view
+  my.auto_scroll = false
 }
 
 gtk.text_box.append = { text |
-	end = gtk.get_opaque
+  end = gtk.get_opaque
   gtk.send "gtk_text_buffer_get_end_iter #{my.buffer} #{end}"
-	gtk.send "gtk_text_buffer_insert #{my.buffer} #{end} '#{text}' #{text.length}"
-	gtk.send "g_free #{end}"
-	true? my.auto_scroll
-		{ end = gtk.get_opaque
-			gtk.send "gtk_text_buffer_get_end_iter #{my.buffer} #{end}"
-			gtk.send "gtk_text_view_scroll_to_iter #{my.view} #{end} 0 true 0 0"
-			gtk.send "g_free #{end}"
-		}
+  gtk.send "gtk_text_buffer_insert #{my.buffer} #{end} '#{text}' #{text.length}"
+  gtk.send "g_free #{end}"
+  true? my.auto_scroll
+    { end = gtk.get_opaque
+      gtk.send "gtk_text_buffer_get_end_iter #{my.buffer} #{end}"
+      gtk.send "gtk_text_view_scroll_to_iter #{my.view} #{end} 0 true 0 0"
+      gtk.send "g_free #{end}"
+    }
 }
 
 gtk.text_box.text = { text = null |
-	null? text
-		{ 
-			text = gtk.send "u_text_grab #{my.id}" 
-			true? text == "(null)"
-				{ text = "" }
-			text
-		}
-		{ gtk.send "u_text_text #{my.id} #{input}" }
+  null? text
+    {
+      text = gtk.send "u_text_grab #{my.id}"
+      true? text == "(null)"
+        { text = "" }
+      text
+    }
+    { gtk.send "u_text_text #{my.id} #{input}" }
 }
 
 gtk.text_input = widget.new
 gtk.text_input.init = { width = 100, height = 5, default = null |
-	my.id = gtk.send "gtk_entry_new"
-	p "Input id: #{my.id}"
-	gtk.send "gtk_widget_set_size_request #{my.id} #{width} #{height}"
-	false? null?(default)
-		{ gtk.send "gtk_entry_set_text #{my.id} #{default}" }
-	gtk.send "gtk_widget_set_name #{my.id} #{my.id}"
-	gtk.send "gtk_widget_show #{my.id}"
+  my.id = gtk.send "gtk_entry_new"
+  p "Input id: #{my.id}"
+  gtk.send "gtk_widget_set_size_request #{my.id} #{width} #{height}"
+  false? null?(default)
+    { gtk.send "gtk_entry_set_text #{my.id} #{default}" }
+  gtk.send "gtk_widget_set_name #{my.id} #{my.id}"
+  gtk.send "gtk_widget_show #{my.id}"
 }
 
 gtk.text_input.text = { input = null |
-	null? input
-		{ 
-			text = gtk.send "u_entry_grab #{my.id}"
-			true? text == "(null)"
-				{ text = "" }
-			text
-		}
-		{ gtk.send "u_entry_text #{my.id} #{input}" }
+  null? input
+    {
+      text = gtk.send "u_entry_grab #{my.id}"
+      true? text == "(null)"
+        { text = "" }
+      text
+    }
+    { gtk.send "u_entry_text #{my.id} #{input}" }
 }
 
 gtk.hbox = widget.new
 gtk.hbox.init = { even_spacing = false, spacing = 5 |
-	my.id = gtk.send "gtk_hbox_new #{even_spacing} #{spacing}"
-} 
+  my.id = gtk.send "gtk_hbox_new #{even_spacing} #{spacing}"
+}
 
 gtk.hbox.append = { widget |
-	gtk.send "gtk_box_pack_end #{my.id} #{widget.id} true true 0"
+  gtk.send "gtk_box_pack_end #{my.id} #{widget.id} true true 0"
 }
 
 gtk.vbox = widget.new
 gtk.vbox.init = { even_spacing = false, spacing = 5 |
-	my.id = gtk.send "gtk_vbox_new #{even_spacing} #{spacing}"
-} 
+  my.id = gtk.send "gtk_vbox_new #{even_spacing} #{spacing}"
+}
 
-gtk.vbox.append = gtk.hbox->append 
+gtk.vbox.append = gtk.hbox->append
 
 defines.each { d |  gtk.send "gtk_server_define #{d}" }
 gtk.callbacks = hash.new
