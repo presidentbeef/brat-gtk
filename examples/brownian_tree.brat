@@ -16,6 +16,14 @@ world_size.times { i |
   }
 }
 
+all_inside_world? = { *args |
+  args.all? { n |
+    n > 0 && { n < world_size }
+  }
+}
+
+new_point = { random world_size }
+
 #First particle
 middle = (world_size / 2).to_i
 positions[middle][middle] = 1
@@ -25,8 +33,8 @@ particles.times { particle |
 
   print "\rParticle ##{particle}"
 
-  x = random world_size
-  y = random world_size
+  x = new_point
+  y = new_point
 
   while {
     dx = random -1 1
@@ -35,8 +43,8 @@ particles.times { particle |
     nextx = x + dx
     nexty = y + dy
 
-    true? { nextx < 0 || nextx >= world_size || nexty < 0 || nexty >= world_size }
-      { x = random world_size; y = random world_size }
+    false? all_inside_world?(x, y, nextx, nexty)
+      { x = new_point; y = new_point }
       { true? positions[nextx][nexty] == 1
         { positions[x][y] = 1
           color = "#{random(255).to_hex}#{random(255).to_hex}#{random(255).to_hex}"
@@ -49,7 +57,6 @@ particles.times { particle |
         }
       }
   }
-
 }
 
 gtk.run
