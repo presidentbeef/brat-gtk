@@ -20,9 +20,7 @@ draw_tree = { x1, y1, angle, depth |
 
 
 gtk.window.add canvas
-gtk.window.show
 
-while { true } {
+gtk.run {
   draw_tree 300, 500, -90, 9
-  gtk.send "u_event 1"
 }
