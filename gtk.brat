@@ -33,10 +33,21 @@ gtk.run = { block = true |
   protect {
     my.window.show
 
-    while {
-      result = my.send "u_event"
-      true? my.callbacks.key?(result) { my.callbacks[result]() }
-      (result != my.window.id) && ->block
+    true? function?(->block)
+    {
+      while {
+        carry_on = block
+        result = my.send "u_event 1"
+        true? my.callbacks.key?(result) { my.callbacks[result]() }
+        (result != my.window.id) && carry_on
+      }
+    }
+    {
+      while {
+        result = my.send "u_event"
+        true? my.callbacks.key?(result) { my.callbacks[result]() }
+        result != my.window.id
+      }
     }
   }
 
