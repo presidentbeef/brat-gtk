@@ -29,17 +29,19 @@ gtk.connect = { widget, block |
 	my.callbacks[widget.id] = ->block
 }
 
-gtk.run = {
-	protect {
-		my.window.show
-		while {
-			result = my.send "u_event"
-			true? my.callbacks.key?(result) { my.callbacks[result]() }
-			result != my.window.id
-		}
-	} 
-	rescue: { e | p e }
-	ensure: { gtk.send "u_end" }
+gtk.run = { block = true |
+  protect {
+    my.window.show
+
+    while {
+      result = my.send "u_event"
+      true? my.callbacks.key?(result) { my.callbacks[result]() }
+      (result != my.window.id) && ->block
+    }
+  }
+
+  rescue: { e | p e }
+  ensure: { gtk.send "u_end" }
 }
 
 widget.init = { id = null |
